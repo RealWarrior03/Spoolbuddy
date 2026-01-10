@@ -85,7 +85,6 @@ struct SpoolDetailView: View {
             
             Text("\(String(format: "%.0f%", spool.filament.spoolWeight))g")
               .font(.subheadline.weight(.semibold))
-              .foregroundColor(.black)
           }.padding(.top, 10)
         }
       }
