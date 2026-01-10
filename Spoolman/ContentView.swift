@@ -10,94 +10,52 @@ import SwiftData
 
 struct ContentView: View {
   @Environment(\.modelContext) private var modelContext
-  @Query var servers: [Server]
+  @Query private var servers: [Server]
   
-  @State private var spools: [Spool] = []
-  @State private var filaments: [Filament] = []
-  @State private var vendors: [Vendor] = []
-  
-  enum SheetType: Identifiable {
+  enum Tabs: Identifiable {
+    case home
+    case spools
+    case filaments
+    case vendors
     case settings
+    case search
     
     var id: Int {
       self.hashValue
     }
   }
-  @State private var selectedSheet: SheetType? = nil
+  @State private var defaultTab: Tabs = .spools
 
   var body: some View {
     if servers.isEmpty {
       SetupView()
     } else {
-      NavigationStack {
-        List {
-          
-          Section(header: Text("Spools")) {
-            ForEach(spools) { spool in
-              HStack {
-                Circle()
-                  .frame(width: 20, height: 20)
-                  .foregroundStyle(Color(hex: spool.filament.colorHex)!)
-                  .overlay {
-                    Circle()
-                      .stroke(.secondary, style: StrokeStyle(lineWidth: 1))
-                  }
-                Text(spool.filament.name)
-              }
-            }
-          }
-          
-          Section(header: Text("Filaments")) {
-            ForEach(filaments) { filament in
-              Text(filament.name)
-            }
-          }
-          
-          Section(header: Text("Vendors")) {
-            ForEach(vendors) { vendor in
-              Text(vendor.name)
-            }
-          }
+      TabView(selection: $defaultTab) {
+        Tab(value: .spools, role: .none) {
+          SpoolView()
+        } label: {
+          Label("Spools", systemImage: "document")
         }
-        .onAppear {
-          Task {
-            print("fetching data")
-            let server = servers.first!
-            let url = "\(server.address):\(server.port)/api/v1"
-            do {
-              spools = try await NetworkManager.shared
-                .request(url: URL(string: "\(url)/spool")!, method: .GET)
-            } catch {
-              print(error.localizedDescription)
-            }
-            do {
-              filaments = try await NetworkManager.shared.request(url: URL(string: "\(url)/filament")!, method: .GET)
-            } catch {
-              print(error.localizedDescription)
-            }
-            do {
-              vendors = try await NetworkManager.shared.request(url: URL(string: "\(url)/vendor")!, method: .GET)
-            } catch {
-              print(error.localizedDescription)
-            }
-            print("data fetched")
-          }
+        Tab(value: .settings, role: .none) {
+          SettingsView()
+        } label: {
+          Label("Settings", systemImage: "gear")
         }
-        .navigationTitle("Spoolbuddy")
-        .toolbar {
-          ToolbarItem {
-            Button {
-              selectedSheet = .settings
-            } label: {
-              Image(systemName: "gear")
-            }
-          }
+        /*Tab(value: .filaments, role: .none) {
+          Text("filament view")
+        } label: {
+          Label("Filaments", systemImage: "paintbrush.pointed")
         }
-        .sheet(item: $selectedSheet) { sheet in
-          switch sheet {
-          case .settings:
-            SettingsView()
-          }
+        Tab(value: .vendors, role: .none) {
+          Text("brand view")
+        } label: {
+          Label("Brands", systemImage: "person")
+        }*/
+        
+        Tab(value: .search, role: .search) {
+          Text("search coming soon")
+        } label: {
+          Label("Search", systemImage: "magnifyingglass")
         }
       }
     }

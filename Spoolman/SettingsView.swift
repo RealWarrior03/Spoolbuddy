@@ -18,10 +18,21 @@ struct SettingsView: View {
           Text("available servers")
             .badge(servers.count)
           ForEach(servers) { server in
-            HStack {
-              Text("\(server.name)")
-              Spacer()
-              Text("\(server.address):\(server.port)")
+            // Create a binding to this server's `active` property
+            let isActiveBinding = Binding<Bool>(
+              get: { server.active },
+              set: { newValue in
+                // Because `Server` is a SwiftData model reference, mutating it directly updates the model
+                server.active = newValue
+              }
+            )
+
+            Toggle(isOn: isActiveBinding) {
+              VStack(alignment: .leading) {
+                Text(server.name)
+                  .bold()
+                Text("\(server.address):\(server.port)")
+              }
             }
           }
         }

@@ -22,7 +22,8 @@ struct SetupView: View {
       id: UUID(),
       name: serverName,
       address: serverAddress,
-      port: serverPort
+      port: serverPort,
+      active: true
     )
     
     modelContext.insert(newServer)
