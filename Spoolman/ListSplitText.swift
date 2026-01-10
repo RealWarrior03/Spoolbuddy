@@ -8,11 +8,14 @@
 import SwiftUI
 
 struct ListSplitText: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+  var title: String
+  var value: String
+  
+  var body: some View {
+    HStack {
+      Text(title)
+      Spacer()
+      Text(value)
     }
-}
-
-#Preview {
-    ListSplitText()
+  }
 }
